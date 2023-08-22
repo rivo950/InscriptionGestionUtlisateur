@@ -24,8 +24,10 @@ class AuthController extends Controller
         $user->password = bcrypt($request->password);
         $user->save();
 
+
+
         // Envoyez un e-mail avec le token d'activation 
-        Mail::to($user->email)->send(new ActivationMail($user, $user->activation_token));
+        Mail::to($user->email)->send(new ActivationMail($user, $user->api_token));
 
         //renvoier une réponse JSON indiquant qu'une inscription a réussi ou echec.
         return response()->json([
@@ -36,7 +38,7 @@ class AuthController extends Controller
         //Tâche 2: Créer une API pour activer le compte d'utilisateur en utilisant le token d'activation. L'API devrait permettre de :
     public function activateAccount($token)
     {
-        $utilisateur = User::where('activation_token', $token)->first();
+        $utilisateur = User::where('api_token', $token)->first();
 
         if (!$utilisateur) {
             return response()->json(['message' => 'Token d\'activation invalide'], 404);
