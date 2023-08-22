@@ -1,7 +1,9 @@
 Hello {{ $user->name }},
+<br>
 
-Welcome to our platform! To activate your account, click the link below:
+Welcome ! To activate your account, click the link below:
+<br>
 
-{{  $activationToken }}
+<a href="">{{  $activationToken }}</a>
 
 Thank you,
