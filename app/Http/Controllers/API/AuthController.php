@@ -6,8 +6,11 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use App\Mail\ActivationMail;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -46,28 +49,19 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Votre compte a été activé. Veuillez vous connecter']);
     }
+    //Tâche 3: Mettre en place une API de connexion utilisateur
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-        $credentials = $request->only('email', 'password');
-        $token = Auth::attempt($credentials);
-        
-        if (!$token) {
-            return response()->json([
-                'message' => 'Identification non valides',
-            ], 401);
-        }
+        {
+            $credentials = $request->only('email', 'password');
 
-        $user = Auth::user();
-        return response()->json([
-            'user' => $user,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ]);
-    }
+            try {
+                if (!$token = JWTAuth::attempt($credentials)) {
+                    return response()->json(['error' => 'Identification non valides'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Impossible de créer un token'], 500);
+            }
+
+            return response()->json(['token' => $token]);
+        }
 }
